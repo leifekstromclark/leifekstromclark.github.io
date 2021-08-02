@@ -14,6 +14,7 @@ class Soldier {
         this.rectangle = new Polygon([foot1, foot2, new Vector(foot2.x, foot2.y - this.height), new Vector(foot1.x, foot1.y - this.height)]);
         this.crouch_speedmod = 0.5;
         this.crouch_heightmod = 0.7;
+        this.jump_speed = -650;
         this.crouched = false;
         this.climbing = 0;
         this.rotation = 0;
@@ -38,7 +39,7 @@ class Soldier {
         }
 
         //if jump input (btw in the main file make it so that you have to release before jumping again)
-        if (jump) {
+        if (jump && this.grounded != -1) {
             this.jump();
         }
 
@@ -422,7 +423,7 @@ class Soldier {
             let previous = this.grounded;
             this.grounded = -1;
             this.crouched = false;
-            this.velocity = -10;
+            this.velocity = this.jump_speed;
             return [true, previous];
         }
         return [false];

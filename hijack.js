@@ -1,6 +1,6 @@
 hijack = {
-    "gravity": 200,
-    "terminal_velocity": 400,
+    "gravity": 1000,
+    "terminal_velocity": 800,
     "terrain": [
         {
             "points": [{"x": 605, "y": 635}, {"x": 755, "y": 620}, {"x": 755, "y": 700}, {"x": 605, "y": 700}],

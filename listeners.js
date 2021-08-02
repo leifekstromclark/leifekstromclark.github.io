@@ -11,6 +11,9 @@ function keyDown(key) {
     if (key.keyCode === 68 || key.keyCode === 39) {
         keys[1] = true;
     }
+    if (key.keyCode === 87 || key.keyCode === 38 || key.keyCode === 32) {
+        keys[2] = true;
+    }
 }
 
 function keyUp(key) {
@@ -19,5 +22,8 @@ function keyUp(key) {
     }
     if (key.keyCode === 68 || key.keyCode === 39) {
         keys[1] = false;
+    }
+    if (key.keyCode === 87 || key.keyCode === 38 || key.keyCode === 32) {
+        keys[2] = false;
     }
 }

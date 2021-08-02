@@ -66,9 +66,14 @@ function air_collision(polygon_a, polygon_b) {
     return [true, translation_axis.multiply(min_interval_distance)];
 }
 
+//(1785, 910), (1785, 1210)    2120, 3570, -535500
+//(1600, 1000), (1650, 1000)   2000, 3250, 50000
+
+//-250000, -1918875000, 1177000000
+
 function points_to_coefficients(p1, p2) {
-    let a = p1.y + p2.y;
-    let b = p2.x + p1.x;
+    let a = p1.y - p2.y;
+    let b = p2.x - p1.x;
     let c = p1.x * p2.y - p2.x * p1.y;
     return [a, b, -c];
 }

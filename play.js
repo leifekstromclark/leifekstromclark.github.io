@@ -6,7 +6,16 @@ function play() {
     if (keys[1]) {
         heading += 1;
     }
-    player.update_position(heading, false, false, ticker.elapsedMS / 1000);
+    let jump = false;
+    if (keys[2] && !jumped) {
+        jump = true;
+        jumped = true;
+    }
+    if (!keys[2]) {
+        jumped = false;
+    }
+
+    player.update_position(heading, jump, false, ticker.elapsedMS / 1000);
 
     let half_width = WIDTH / 2;
     let half_height = HEIGHT / 2;
