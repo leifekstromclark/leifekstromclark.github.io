@@ -16,7 +16,7 @@ const renderer = new PIXI.Renderer({
 })
 window.addEventListener('resize', resize);
 
-let keys = [false, false]
+let input = new Input();
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
 

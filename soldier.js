@@ -13,7 +13,7 @@ class Soldier {
         let foot2 = new Vector(this.position.x + this.width / 2, this.position.y);
         this.rectangle = new Polygon([foot1, foot2, new Vector(foot2.x, foot2.y - this.height), new Vector(foot1.x, foot1.y - this.height)]);
         this.crouch_speedmod = 0.5;
-        this.crouch_heightmod = 0.7;
+        this.crouch_heightmod = 0.5;
         this.jump_speed = -650;
         this.crouched = false;
         this.climbing = 0;
