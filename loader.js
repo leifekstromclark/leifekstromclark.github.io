@@ -28,7 +28,7 @@ function loadComplete() {
 
     crosshair = new PIXI.Graphics();
     crosshair.lineStyle(1, 0xffffff);
-    crosshair.drawCircle(0, 0, 100);
+    crosshair.drawCircle(0, 0, 10);
     crosshair.endFill();
     stage.addChild(crosshair);
 
