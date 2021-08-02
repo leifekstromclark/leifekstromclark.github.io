@@ -34,7 +34,7 @@ let rect;
 let outlines;
 let ao = new AO(hijack);
 let jumped = false;
-let player = new Soldier(ao, new Vector(1000, 0), 50, 100, 300, null, null);
+let player = new Soldier(ao, new Vector(1900, 600), 50, 100, 400, null, null);
 
 //Main loop
 function gameLoop(){

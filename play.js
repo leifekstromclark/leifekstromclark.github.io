@@ -16,6 +16,10 @@ function play() {
     }
 
     player.update_position(heading, jump, false, ticker.elapsedMS / 1000);
+    if (player.position.y > 2500) {
+        player.translate(new Vector(1900, 600).subtract(player.position));
+        player.velocity = 0;
+    }
 
     let half_width = WIDTH / 2;
     let half_height = HEIGHT / 2;
