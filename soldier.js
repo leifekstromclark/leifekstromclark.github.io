@@ -39,7 +39,7 @@ class Soldier {
         }
 
         //if jump input (btw in the main file make it so that you have to release before jumping again)
-        if (jump && this.grounded != -1) {
+        if (jump && this.grounded != -1 && !this.crouched) {
             this.jump();
         }
 
@@ -418,11 +418,10 @@ class Soldier {
         else {
             origin = this.rectangle.points[1];
         }
-
+        
         if (this.rotate(origin, 0, [this.grounded], true)) {
             let previous = this.grounded;
             this.grounded = -1;
-            this.crouched = false;
             this.velocity = this.jump_speed;
             return [true, previous];
         }
@@ -444,73 +443,71 @@ class Soldier {
     */
     rotate(origin, target, ignore, stand) {
         let success = true;
-        if (this.rotation != target) { //might save some operations in a few cases
 
-            if (this.crouched && stand) {
-                let base = this.rectangle.points[1].subtract(this.rectangle.points[0]);
-                let side = new Vector(base.y, -base.x).normalize().multiply(this.height);
+        if (this.crouched && stand) {
+            let base = this.rectangle.points[1].subtract(this.rectangle.points[0]);
+            let side = new Vector(base.y, -base.x).normalize().multiply(this.height);
 
-                this.rectangle = new Polygon([this.rectangle.points[0], this.rectangle.points[1], this.rectangle.points[1].add(side), this.rectangle.points[0].add(side)]);
+            this.rectangle = new Polygon([this.rectangle.points[0], this.rectangle.points[1], this.rectangle.points[1].add(side), this.rectangle.points[0].add(side)]);
+        }
+
+        let standing = stand;
+
+        if (!this.crouched) {
+            standing = true;
+        }
+        
+        //might make this a helper function (there are 2 occurances but i have no idea what to call the function or how to justify it)
+        if (target == 0) { //we can have funny conditionals in here because the only case where the origin is not one of these conditions is when this.rotation = 0 (see top conditional) (but right now imma justbe safe)
+            if (origin.x == this.position.x && origin.y == this.position.y) {
+                this.reset(origin);
             }
-
-            let standing = stand;
-
-            if (!this.crouched) {
-                standing = true;
+            else if (origin.x == this.rectangle.points[0].x && origin.y == this.rectangle.points[0].y) {
+                this.reset(origin.add(new Vector(this.width / 2, 0)));
             }
-            
-            //might make this a helper function (there are 2 occurances but i have no idea what to call the function or how to justify it)
+            else if (origin.x == this.rectangle.points[1].x && origin.y == this.rectangle.points[1].y) {
+                this.reset(origin.add(new Vector(this.width / -2, 0)));
+            }
+        }
+        else {
+            this.rectangle.rotate(origin, target - this.rotation);
+        }
+
+        for (let i = 0; i < this.ao.terrain.length; i++) {
+            if (!ignore.includes(i)) {
+                let result = air_collision(this.rectangle, this.ao.terrain[i].poly); //maybe this should be air? lets have a look at the collision algorithms later and optimize them a bit
+                if (result[0]) {
+                    this.rectangle.rotate(origin, this.rotation - target); //add reset in here
+                    success = false;
+                    break;
+                }
+            }
+        }
+        
+        if (success) {
             if (target == 0) { //we can have funny conditionals in here because the only case where the origin is not one of these conditions is when this.rotation = 0 (see top conditional) (but right now imma justbe safe)
                 if (origin.x == this.position.x && origin.y == this.position.y) {
-                    this.reset(origin);
+                    this.shoulder = origin.add(this.shoulder_offset);
+                    this.crouched_shoulder = origin.add(this.crouched_shoulder_offset);
                 }
                 else if (origin.x == this.rectangle.points[0].x && origin.y == this.rectangle.points[0].y) {
-                    this.reset(origin.add(new Vector(this.width / 2, 0)));
+                    this.position = origin.add(new Vector(this.width / 2, 0));
+                    this.shoulder = this.position.add(this.shoulder_offset);
+                    this.crouched_shoulder = this.position.add(this.crouched_shoulder_offset);
                 }
                 else if (origin.x == this.rectangle.points[1].x && origin.y == this.rectangle.points[1].y) {
-                    this.reset(origin.add(new Vector(this.width / -2, 0)));
+                    this.position = origin.add(new Vector(this.width / -2, 0));
+                    this.shoulder = this.position.add(this.shoulder_offset);
+                    this.crouched_shoulder = this.position.add(this.crouched_shoulder_offset);
                 }
             }
             else {
-                this.rectangle.rotate(origin, target - this.rotation);
-            }
-
-            for (let i; i < this.ao.terrain.length; i++) {
-                if (!ignore.includes(i)) {
-                    let result = grounded_collision(this.rectangle, terrain[i].poly, ZERO_VECTOR); //maybe this should be air? lets have a look at the collision algorithms later and optimize them a bit
-                    if (result[0]) {
-                        this.rectangle.rotate(origin, this.rotation - target); //add reset in here
-                        success = false;
-                        break;
-                    }
-                }
+                this.position = this.position.rotate(origin, target - this.rotation)
+                this.crouched_shoulder = this.crouched_shoulder.rotate(origin, target - this.rotation)
+                this.shoulder = this.shoulder.rotate(origin, target - this.rotation)
             }
             
-            if (success) {
-                if (target == 0) { //we can have funny conditionals in here because the only case where the origin is not one of these conditions is when this.rotation = 0 (see top conditional) (but right now imma justbe safe)
-                    if (origin.x == this.position.x && origin.y == this.position.y) {
-                        this.shoulder = origin.add(this.shoulder_offset);
-                        this.crouched_shoulder = origin.add(this.crouched_shoulder_offset);
-                    }
-                    else if (origin.x == this.rectangle.points[0].x && origin.y == this.rectangle.points[0].y) {
-                        this.position = origin.add(new Vector(this.width / 2, 0));
-                        this.shoulder = this.position.add(this.shoulder_offset);
-                        this.crouched_shoulder = this.position.add(this.crouched_shoulder_offset);
-                    }
-                    else if (origin.x == this.rectangle.points[1].x && origin.y == this.rectangle.points[1].y) {
-                        this.position = origin.add(new Vector(this.width / -2, 0));
-                        this.shoulder = this.position.add(this.shoulder_offset);
-                        this.crouched_shoulder = this.position.add(this.crouched_shoulder_offset);
-                    }
-                }
-                else {
-                    this.position = this.position.rotate(origin, target - this.rotation)
-                    this.crouched_shoulder = this.crouched_shoulder.rotate(origin, target - this.rotation)
-                    this.shoulder = this.shoulder.rotate(origin, target - this.rotation)
-                }
-                
-                this.rotation = target
-            }
+            this.rotation = target
         }
         return success
     }
