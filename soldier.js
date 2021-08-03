@@ -28,13 +28,12 @@ class Soldier {
 
     //BRING BACK VELINCOL
     update_position(heading, jump, crouch, dt) {
-
         //if crouch input and not crouched and grounded
         if (crouch && !this.crouched && this.grounded != -1) {
-            this.crouch(true);
+            this.crouch();
         }
         //if no crouch input and crouched
-        else if (!crouch && this.crouched) {
+        else if ((!crouch || this.grounded == -1) && this.crouched) {
             this.uncrouch();
         }
 
@@ -210,7 +209,7 @@ class Soldier {
                 ignore.push(to_ground + 1);
             }
 
-            let success = this.rotate(origin, target, ignore, true); //doesnt matter if last param is true or false
+            let success = this.rotate(origin, target, ignore);
 
             if (success) {
                 this.grounded = to_ground;
@@ -278,7 +277,7 @@ class Soldier {
                     let next_ground_edge = next_ground.poly.points[1].subtract(next_ground.poly.points[0]);
                     let target = Math.asin(next_ground_edge.normalize().y);
                     
-                    success = this.rotate(this.position, target, ignore, false);
+                    success = this.rotate(this.position, target, ignore);
 
                     if (success) {
                         this.grounded = rotate;
@@ -293,10 +292,10 @@ class Soldier {
                         origin = this.rectangle.points[0];
                     }
 
-                    let success = this.rotate(origin, 0, [this.grounded], true);
+                    let success = this.rotate(origin, 0, [this.grounded]);
                     
                     if (success) {
-                        this.crouch(false);
+                        this.uncrouch();
                         let d2 = new Vector(fall * (Math.abs(distance) - d1.get_norm()), 0);
                         for (let i = 0; i < this.ao.terrain.length; i++) {
                             if (i != this.grounded) {
@@ -332,15 +331,13 @@ class Soldier {
         #check for collision and move after
     */
 
-    crouch(crouch) {
+    //remove checkless uncrouch from here
+    crouch() {
         let base = this.rectangle.points[1].subtract(this.rectangle.points[0]);
-        let side = new Vector(base.y, -base.x).normalize().multiply(this.height);
-        if (crouch) {
-            side = side.multiply(this.crouch_heightmod);
-        }
+        let side = new Vector(base.y, -base.x).normalize().multiply(this.height * this.crouch_heightmod);
         this.rectangle.points[3] = this.rectangle.points[0].add(side);
         this.rectangle.points[2] = this.rectangle.points[1].add(side);
-        this.crouched = crouch;
+        this.crouched = true;
     }
     
     uncrouch() {
@@ -364,7 +361,7 @@ class Soldier {
         for (let i = 0; i < this.ao.terrain.length; i++) {
             if (!ignore.includes(i)) {
                 let result = grounded_collision(standing_rectangle, this.ao.terrain[i].poly, ZERO_VECTOR) //maybe this should be air? lets have a look at the collision algorithms later and optimize them a bit
-                if (result[0]) {
+                if (result[0] && (result[1].x != 0 || result[1].y != 0)) {
                     success = false;
                     break;
                 }
@@ -419,7 +416,7 @@ class Soldier {
             origin = this.rectangle.points[1];
         }
         
-        if (this.rotate(origin, 0, [this.grounded], true)) {
+        if (this.rotate(origin, 0, [this.grounded])) {
             let previous = this.grounded;
             this.grounded = -1;
             this.velocity = this.jump_speed;
@@ -441,21 +438,9 @@ class Soldier {
     Rotate the soldier if able.
     Return a boolean representing the success or failure of the transformation.
     */
-    rotate(origin, target, ignore, stand) {
+    rotate(origin, target, ignore) {
         let success = true;
-
-        if (this.crouched && stand) {
-            let base = this.rectangle.points[1].subtract(this.rectangle.points[0]);
-            let side = new Vector(base.y, -base.x).normalize().multiply(this.height);
-
-            this.rectangle = new Polygon([this.rectangle.points[0], this.rectangle.points[1], this.rectangle.points[1].add(side), this.rectangle.points[0].add(side)]);
-        }
-
-        let standing = stand;
-
-        if (!this.crouched) {
-            standing = true;
-        }
+        //might add back if rotation != target
         
         //might make this a helper function (there are 2 occurances but i have no idea what to call the function or how to justify it)
         if (target == 0) { //we can have funny conditionals in here because the only case where the origin is not one of these conditions is when this.rotation = 0 (see top conditional) (but right now imma justbe safe)
@@ -476,7 +461,7 @@ class Soldier {
         for (let i = 0; i < this.ao.terrain.length; i++) {
             if (!ignore.includes(i)) {
                 let result = air_collision(this.rectangle, this.ao.terrain[i].poly); //maybe this should be air? lets have a look at the collision algorithms later and optimize them a bit
-                if (result[0]) {
+                if (result[0] && (result[1].x != 0 || result[1].y != 0)) {
                     this.rectangle.rotate(origin, this.rotation - target); //add reset in here
                     success = false;
                     break;
