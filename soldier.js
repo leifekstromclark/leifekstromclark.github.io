@@ -13,8 +13,8 @@ class Soldier {
         let foot2 = new Vector(this.position.x + this.width / 2, this.position.y);
         this.rectangle = new Polygon([foot1, foot2, new Vector(foot2.x, foot2.y - this.height), new Vector(foot1.x, foot1.y - this.height)]);
         this.crouch_speedmod = 0.5;
-        this.crouch_heightmod = 0.5;
-        this.jump_speed = -650;
+        this.crouch_heightmod = 0.6;
+        this.jump_speed = -600;
         this.crouched = false;
         this.climbing = 0;
         this.rotation = 0;
@@ -47,7 +47,7 @@ class Soldier {
         if (this.grounded == -1) {
             let move;
             //if climbing and moving in climb direction
-            if (this.climbing != 0 && this.climbing == this.heading) {
+            if (this.climbing != 0 && this.climbing == heading) {
                 move = new Vector(heading * this.walking_speed * dt, -this.walking_speed * dt);
             }
             else {
@@ -80,7 +80,7 @@ class Soldier {
                     this.translate(result[1]);
                     //hit valid ground
                     if (chunk.ground) {
-                        landed = this.land(i, result[1]);
+                        landed = this.land(i, result[1], heading);
                         //successful landing abort the air collision detection
                         if (landed) {
                             break;
@@ -108,7 +108,7 @@ class Soldier {
         }
     }
     
-    land(i, translation_vector) {
+    land(i, translation_vector, heading) {
         let chunk = this.ao.terrain[i];
         let to_ground = -1;
         let origin;
@@ -190,11 +190,11 @@ class Soldier {
         if (to_ground == -1) {
             //make y check be shoulder or something later on
             //we could merge these if statements but it would be pretty unreadable
-            if (this.heading == -1 && this.rectangle.points[3].y <= chunk.poly.points[1].y && (this.rectangle.points[0].x == chunk.poly.points[1].x || (chunk.poly.points[1].x < this.rectangle.points[0].x && this.rectangle.points[0] <= chunk.poly.points[2].x))) {
+            if (heading == -1 && this.shoulder.y <= chunk.poly.points[1].y && (this.rectangle.points[0].x == chunk.poly.points[1].x || (chunk.poly.points[1].x < this.rectangle.points[0].x && this.rectangle.points[0] <= chunk.poly.points[2].x))) {
                 this.velocity = 0;
                 this.climbing = -1;
             }
-            else if (this.heading == 1 && this.rectangle.points[2].y <= chunk.poly.points[0].y && (this.rectangle.points[1].x == chunk.poly.points[0].x || (chunk.poly.points[-1].x <= this.rectangle.points[1].x && this.rectangle.points[1].x < chunk.poly.points[0].x))) {
+            else if (heading == 1 && this.shoulder.y <= chunk.poly.points[0].y && (this.rectangle.points[1].x == chunk.poly.points[0].x || (chunk.poly.points[chunk.poly.points.length - 1].x <= this.rectangle.points[1].x && this.rectangle.points[1].x < chunk.poly.points[0].x))) {
                 this.velocity = 0;
                 this.climbing = 1;
             }
