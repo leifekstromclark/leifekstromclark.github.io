@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <style>
+    body{
+      margin: 0;
+    }
+    canvas{
+      display: block;
+    }
+  </style>
+  <body>
+    <a href="/">Home</a>
+    <br>
+    Mode: 
+    <select id="ms">
+      <option value="edit">Edit</option>
+      <option value="add">Add</option>
+      <option value="path">Path</option>
+    </select>
+    <button id="gt">Toggle Ground</button>
+    Upload an Image:
+    <input id="upload" type="file"></input>
+    <button id="save">Save</button>
+    <a id="download">Download Map JSON</a>
+    <div style="width:100vw;height:90vh;">
+      <canvas id="mycanvas"></canvas>
+    </div>
+    <script src="static/pixi/pixi.min.js"></script>
+    <script src="static/mapmaker/vector.js"></script>
+    <script src="static/mapmaker/polygon.js"></script>
+    <script src="static/mapmaker/chunk.js"></script>
+    <script src="static/mapmaker/ao.js"></script>
+    <script src="static/mapmaker/constants.js"></script>
+    <script src="static/mapmaker/resize.js"></script>
+    <script src="static/mapmaker/listeners.js"></script>
+    <script src="static/mapmaker/main.js"></script>
+  </body>
+  Shortcuts: Left Control to snap
+</html>
