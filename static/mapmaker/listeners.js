@@ -63,6 +63,8 @@ function mouseMove(event) {
                 place_next.y = grid_size.y;
             }
         }
+        coords.position.set(viewport.x + place_next.x * zoom + 3, viewport.y + place_next.y * zoom - 17);
+        coords.text = place_next.x.toString() + ", " + place_next.y.toString();
     }
 }
 
