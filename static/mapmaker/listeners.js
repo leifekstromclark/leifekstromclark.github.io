@@ -47,6 +47,9 @@ function mouseMove(event) {
         }
         else {
             place_next = new Vector(mouse_loc.x - viewport.position.x, mouse_loc.y - viewport.position.y).divide(zoom);
+            if (snapping) {
+                place_next = place_next.divide(5).round().multiply(5);
+            }
             if (place_next.x < 0) {
                 place_next.x = 0;
             }
