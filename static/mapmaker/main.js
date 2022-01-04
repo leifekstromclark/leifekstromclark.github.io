@@ -53,6 +53,7 @@ const download = document.getElementById('download');
 //Save
 const save = document.getElementById('save');
 save.addEventListener('click', function() {
+    ao.update_connections();
     let obj = ao.save();
     save_data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
     download.setAttribute('href', 'data:' + save_data);
@@ -71,6 +72,7 @@ ms.addEventListener('change', function() {
     if (this.value != 'add') {
         placing = [];
         place_next = null;
+        coords.text = '';
     }
 });
 
@@ -91,6 +93,23 @@ upload.addEventListener('change', function() {
                 viewport.removeChild(g);
                 viewport.addChild(g);
             }
+        }
+    }
+});
+
+//Map Upload
+const open = document.getElementById('open');
+open.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        let reader = new FileReader();
+        reader.readAsText(this.files[0]);
+
+        let content;
+
+        reader.onload = async(e) => {
+            let result = e.target.result;
+            let content = await JSON.parse(result);
+            ao.load_map(content);
         }
     }
 });

@@ -90,7 +90,7 @@ function mouseDown(event) {
     }
     if (ms.value == 'add') {
         if (placing.length > 0 && place_next == placing[0]) {
-            ao.terrain.push(new Chunk(new Polygon(placing), place_ground, false, false)); // add finding connects
+            ao.terrain.push(new Chunk(new Polygon(placing), place_ground, false, false));
             placing = [];
             place_next = null;
         }
