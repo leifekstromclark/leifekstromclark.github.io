@@ -142,7 +142,7 @@ function tick(dt) {
 }
 
 function boot() {
-    terminal.write("VANROCK Command Terminal [Version 10.0.19043.1348]\n(c) VANROCK Corporation 2043. All rights reserved.", terminal.norm_font);
+    terminal.write("VANROCK Command Terminal [Version 10.0.19043.1348]\n(c) VANROCK Corporation 2041. All rights reserved.", terminal.norm_font);
     to_write.push({type: "send", content: ">>> run Michael_Hancock.daemon\n", delay: 500});
     to_write.push({type: "send", content: "Booting . . .\n", delay: 750});
     to_write.push({type: "send", content: "Checking Asimov hardware-lock integrity . . .\n", delay: 1750});
